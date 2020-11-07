@@ -1,12 +1,63 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO, join_room, emit, send
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user           
+from db import get_user
+from user import User
+
 
 app = Flask(__name__)
+app.secret_key = 'my secret key'
 socketio = SocketIO(app)
-
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+ 
 @app.route('/')
 def home():
     return render_template("index.html")
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated    :
+        return redirect(url_for('home'))
+
+    message = ''
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password_input = request.form.get('password')
+        user = get_user(username)
+        
+        if user and user.check_password(password_input):
+            login_user(user)
+            return redirect(url_for('home'))
+        else: 
+            message = 'Failed to login'
+    return render_template('login.html', message=message)
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    message = ''
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        try:
+            save_user(username, email, password)
+            return redirect(url_for('login'))
+        except DuplicateKeyError:
+            message = "User already exists!"
+
+    return render_template('signup.html', message=message)
+
+
+@app.route("/logout/")
+@login_required 
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
 
 @app.route('/chat')
 def chat():
@@ -26,18 +77,22 @@ def hangle_send_message_event(data):
     # message to all room
     socketio.emit('receive_message', data, room=data['room'])
 
-
 @socketio.on('leave_room')
 def handle_leave_room_event(data):
     app.loggerinfo('{} has left the room {}'.format(data['username'], data['room']))
     leave_room(data['room'])
     socketio.emit('leave_room_announcement', data, room=data['room'])
 
-@socketio.on('join_room') # event
+@socketio.on('join_room') # even
 def handle_join_room_event(data):
     app.logger.info("{} has joined the room {}.".format(data['username'], data['room']))
     join_room(data['room'])
     socketio.emit('join_room_announcement', data, room=data['room'])
+
+@login_manager.user_loader
+def load_user(username):
+    return get_user(username)
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

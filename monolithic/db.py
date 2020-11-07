@@ -1,10 +1,12 @@
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash
 from user import User
+from datetime import datetime
+from bson import ObjectId
 
 client = MongoClient('mongodb+srv://teste:teste@chatapp.8fyq4.mongodb.net/<dbname>?retryWrites=true&w=majority')
 
-chat_db = clien1t.get_database("chatappdb")
+chat_db = client.get_database("chatappdb")
 users_collection = chat_db.get_collection("users")
 rooms_collection = chat_db.get_collection("rooms")
 room_members_collection = chat_db.get_collection("room_members")
@@ -23,9 +25,9 @@ def get_user(username):
     return User(user_data['_id'], user_data['email'], user_data['password']) if user_data else None
 
 
-def save_room(room_name, create_by, usernames):
+def save_room(room_name, created_by):
     room_id = rooms_collection.insert_one(
-        {'room_name': room_name, 'created_by': create_by, 'created_at': datetime.now()}).inserted_id
+        {'room_name': room_name, 'created_by': created_by, 'created_at': datetime.now()}).inserted_id
     
     add_room_member(room_id, room_name, created_by, created_by, is_admin=True)
     return room_id

@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO, join_room, emit, send
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user           
-from db import get_user
+from db import get_user, save_room, save_user
 from user import User
 
 
@@ -18,7 +18,7 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated    :
+    if current_user.is_authenticated:
         return redirect(url_for('home'))
 
     message = ''
@@ -59,10 +59,30 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+@app.route("/create_room", methods=['GET', 'POST'])
+@login_required
+def create_room():
+    message = ''
+    if request.method == "POST":
+        room_name = request.form.get('room_name')
+        usernames = [username.strip() for username in request.form.get('members').split(',')]
+
+        if len(room_name) and len(usernames):
+            room_id = save_room(room_name, current_user.username)
+            if current_user.username in usernames:
+                usernames.remove(current_user.username)
+            add_room_members(room_id, room_name, usernames, current_user.username)
+            return redirect(url_for('view_room', room_id=room_id))
+        else:
+            message = "Failed to create room"
+
+    return render_template('create_room.html')
+
 @app.route('/chat')
-def chat():
+def chat(): 
     username = request.args.get('username')
-    room = request.args.get('room')
+    room = request.args.get('room_name')
+    
 
     if username and room:
         return render_template('chat.html', username=username, room=room)

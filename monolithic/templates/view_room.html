@@ -6,13 +6,27 @@
     <title>Chat App</title>
 </head>
 <body>
-    <h1>Sala de Chat ID: {{ room }}</h1>
-    <div id="messages"></div>
+    <h1>Sala de Chat ID: {{ room.name }}</h1>
+
+    <button type="button" id="load_older_messages_btn">Load older messages</button>
+    <div id="messages">
+        {% for message in messages %}
+            <div><b>{{ message.sender }}&nbsp;[{{ message.created_at }}]:&nbsp;</b>{{ message.text }}</div>
+        {% endfor %}
+    </div>
+    
     <form id="message_input_form">
         <input type="text" id="message_input" placeholder="Escreva sua mensagem aqui">
         <button type="submit">Enviar</button>
         <button id="leave_button">Sair</button>
     </form>
+
+    <ul>
+        {% for member in room_members %}
+            <li>{{ member._id.username }}</li>
+        {% endfor %}
+    </ul>
+
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js"></script>
 <script type="text/javascript" charset="utf-8">
@@ -21,7 +35,7 @@
     socket.on('connect', function(){
         socket.emit('join_room', {
             username: "{{ username }}",
-            room: "{{ room }}"
+            room: "{{ room._id }}"
         })
 
         let message_input = document.getElementById('message_input');
@@ -31,8 +45,8 @@
             let message = message_input.value.trim();
             if (message.length){
                 socket.emit('send_message', { // event
-                    username: "{{ username }}",
-                    room: "{{ room }}",
+                    username: "{{ username }}1",
+                    room: "{{ room._id }}",
                     message: message
                 })
             }
@@ -40,6 +54,36 @@
             message_input.focus();
         }   
     });
+    
+let page = 0
+
+    document.getElementById("load_older_messages_btn").onclick = (e) => {
+        page += 1;
+        fetch("/rooms/{{ room._id }}/messages?page=" + page,{
+            method: 'GET',
+            headers: {
+                'Content-Type' : 'application/json'
+            }
+        }).then(response => {
+            response.json().then(messages => {
+                messages.reverse().forEach(message => prepend_message(message.text, message.sender, message.created_at));
+            })
+        })
+    };
+
+    function prepend_message(message, username, created_at){
+        const newNode = document.createElement('div');
+        newNode.innerHTML = `<b>${username}:&nbsp;[${created_at}]:&nbsp;</b> ${message}`;
+        const messages_div = document.getElementById('messages');
+        messages_div.insertBefore(newNode, messages_div.firstChild);
+    }
+
+    window.onbeforeunload = function() {
+        socket.emit('leave_room', {
+            username: "{{ username }}",
+            room: "{{ room._id }}"
+        })
+    };
 
     socket.on('disconnect', function(){
         socket.emit('leave_room',{
@@ -51,7 +95,7 @@
     socket.on('receive_message', function(data) {
         console.log(data);
         const newNode = document.createElement('div');
-        newNode.innerHTML = `<b>${data.username}:&nbsp;</b> ${data.message}`;
+        newNode.innerHTML = `<b>${data.username}:&nbsp;[${data.created_at}]:&nbsp;</b> ${data.message}`;
         document.getElementById('messages').appendChild(newNode);
     });
 

@@ -8,7 +8,7 @@
 <body>
     <h1>Sala de Chat ID: {{ room.name }}</h1>
 
-    <button type="button" id="load_older_messages_btn">Load older messages</button>
+    <!-- <button type="button" id="load_older_messages_btn">Load older messages</button> -->
     <div id="messages">
         {% for message in messages %}
             <div><b>{{ message.sender }}&nbsp;[{{ message.created_at }}]:&nbsp;</b>{{ message.text }}</div>
@@ -18,8 +18,9 @@
     <form id="message_input_form">
         <input type="text" id="message_input" placeholder="Escreva sua mensagem aqui">
         <button type="submit">Enviar</button>
-        <button id="leave_button">Sair</button>
     </form>
+
+    <a href="/">Sair da Sala</a>
 
     <ul>
         {% for member in room_members %}
@@ -53,36 +54,13 @@
             message_input.value = '';
             message_input.focus();
         }   
-    });
-    
-let page = 0
-
-    document.getElementById("load_older_messages_btn").onclick = (e) => {
-        page += 1;
-        fetch("/rooms/{{ room._id }}/messages?page=" + page,{
-            method: 'GET',
-            headers: {
-                'Content-Type' : 'application/json'
-            }
-        }).then(response => {
-            response.json().then(messages => {
-                messages.reverse().forEach(message => prepend_message(message.text, message.sender, message.created_at));
-            })
-        })
-    };
-
-    function prepend_message(message, username, created_at){
-        const newNode = document.createElement('div');
-        newNode.innerHTML = `<b>${username}:&nbsp;[${created_at}]:&nbsp;</b> ${message}`;
-        const messages_div = document.getElementById('messages');
-        messages_div.insertBefore(newNode, messages_div.firstChild);
-    }
+    }); 
 
     window.onbeforeunload = function() {
         socket.emit('leave_room', {
             username: "{{ username }}",
             room: "{{ room._id }}"
-        })
+        });
     };
 
     socket.on('disconnect', function(){
@@ -112,8 +90,6 @@ let page = 0
         newNode.innerHTML = `<b>${data.username}</b> as joined the room.`;
         document.getElementById('messages').appendChild(newNode);
     });
-
-
 
 </script>
 </html>

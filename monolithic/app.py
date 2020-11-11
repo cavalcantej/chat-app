@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO, join_room, emit, send, leave_room
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user           
-from db import get_user, save_room, save_user, add_room_members, get_room_for_user, get_room_members, get_room, is_room_member, update_room, save_message, get_messages
+from db import get_user, save_room, save_user, get_room_members, is_room_member, add_room_member, get_room, save_message, get_messages, get_all_rooms
 from user import User
 from datetime import datetime
 from bson.json_util import dumps
@@ -14,11 +14,11 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-@app.route('/')
+@app.route('/',  methods=['GET'])
 def home():
     rooms = []
     if current_user.is_authenticated:
-        rooms = get_room_for_user(current_user.username)
+        rooms = get_all_rooms()
     return render_template("index.html", rooms=rooms)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -57,7 +57,6 @@ def signup():
 
     return render_template('signup.html', message=message)
 
-
 @app.route("/logout/")
 @login_required 
 def logout():
@@ -70,67 +69,30 @@ def create_room():
     message = ''
     if request.method == "POST":
         room_name = request.form.get('room_name')
-        usernames = [username.strip() for username in request.form.get('members').split(',')]
+        # usernames = [username.strip() for username in request.form.get('members').split(',')]
 
-        if len(room_name) and len(usernames):
+        if len(room_name) and len(current_user.username):
             room_id = save_room(room_name, current_user.username)
-            if current_user.username in usernames:
-                usernames.remove(current_user.username)
-            add_room_members(room_id, room_name, usernames, current_user.username)
             return redirect(url_for('view_room', room_id=room_id))
         else:
             message = "Failed to create room"
 
     return render_template('create_room.html', message=message)
 
-@app.route('/rooms/<room_id>/edit', methods=['GET', 'POST'])
-@login_required
-def edit_room(room_id):
-    room = get_room(room_id)
-    if room and is_room_member(room_id, current_user.username):
-        existing_room_members = [member['_id']['username'] for member in get_room_members(room_id)]
-        
-        message = ''
-        if request.method == 'POST':
-            room_name = request.form.get('room_name')
-            room['name'] = room_name
-            room_member_str = ",".join(existing_room_members)
-            update_room(room_id, room_name)
-
-            new_members = [username.strip() for username in request.form.get('members').split(',')]        
-            members_to_add = list(set(new_members) - set(existing_members))
-            members_to_remove = list(set(existing_room_members) - set(new_members))
-            if len(members_to_add):
-                add_room_members(room_id, room_name, members_to_add, current_user.username)
-            if len(members_to_remove):
-                remove_room_members(room_id, members_to_remove)
-            message = 'Room edited successfully'
-            room_member_str = ",".join(new_members)
-        return render_template('edit_room.html', room=room, room_member_str=room_member_str)
-    else:
-        return "Room not found", 404
-
-@app.route('/rooms/<room_id>/messages/')
-@login_required
-def get_older_messages(room_id):
-    room = get_room(room_id)
-    if room and is_room_member(room_id, current_user.username):
-        page = int(request.args.get('page', 0))
-        messages = get_messages(room_id, page)
-        return dumps(messages)
-    else:
-        return "Room not found", 404
-
 @app.route('/rooms/<room_id>/')
 @login_required
 def view_room(room_id):
     room = get_room(room_id)
-    if room and is_room_member(room_id,current_user.username):
+
+    if room and not(is_room_member(room_id, current_user.username)):
+        add_room_member(room_id, room['room_name'], current_user.username, current_user.username)
+
+    if room and is_room_member(room_id, current_user.username):
         room_members = get_room_members(room_id)
         messages = get_messages(room_id)
         return render_template('view_room.html',username=current_user.username, room=room, 
                                 room_members=room_members, messages=messages)
-    else:
+    else:     
         return "Room not found", 404
 
 @socketio.on('send_message')
@@ -138,7 +100,6 @@ def hangle_send_message_event(data):
     app.logger.info("{} has sent message to the room {}: {}".format(data['username'],
                                                                     data['room'], 
                                                                     data['message']))
-    # message to all room
     data['created_at'] = datetime.now().strftime("%d %b, %H:%M")
     save_message(data['room'], data['message'], data['username'])
     socketio.emit('receive_message', data, room=data['room'])

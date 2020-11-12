@@ -1,8 +1,12 @@
-FROM python:3.8.6-alpine
+FROM python:3.8
 
-WORKDIR /monolithic
-ADD . /monolithic
 
+
+WORKDIR /app
+ADD . .
+# RUN apk add --no-cache python3-dev libffi-dev gcc musl-dev make
 RUN pip install -r requirements.txt
-RUN pip install 'pymongo[srv]' dnspython
-CMD ["python", "app.py"]
+
+EXPOSE 5000
+ENTRYPOINT ["python"]
+CMD ["app.py"]

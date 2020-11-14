@@ -4,23 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <title>My Chat App</title>
 </head>
 
-<body>
-    <h1>Login</h1>
+<body style="background-color: #302F31;">
+    <div style="text-align: center; margin-top: 0px;">
+        <div style="margin-top: 0px; width: 100%; text-align: center;">
+            <img style="height: 400px;" src="../static/img/logo.png">
+        </div>
     <h3>{{ message }}</h3>
     <form method="post" action="/login">
-        <label>Username:</label>
-        <input type="text" name="username">
+        <label style="color: #FF9900">Username: </label>
+        <input style="width: 200px;" type="text" name="username">
         <br>
-        <label>Password:</label>
-        <input type="password" name="password">
         <br>
-        <button type="submit">Entrar</button>
+        <label style="color: #FF9900">Password: </label>
+        <input style="width: 200px; border:2px solid #FF9900; border-radius: 5px; padding:5px;" type="password" name="password">
+        <br>
+        <br>
+        <input type="submit" value="Entrar" />
     </form>
 
-    <a href="/">Voltar</a>
+    <form action="/">
+        <input type="submit" value="Voltar" />
+    </form>
+
+    </div>
+    
 
 </body>
 

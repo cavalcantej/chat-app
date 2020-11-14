@@ -1,0 +1,58 @@
+html, body{
+	font-family: Arial, Tahoma, sans-serif;
+}
+body{
+	background:#302F31;
+}
+
+form{
+	margin:15px 0;
+}
+form input[type='text']{
+	border:2px solid #FF9900;
+	border-radius: 5px;
+	padding:5px;
+}
+form input[type='submit']{
+	background: #FF9900;
+	border:none;
+	border-radius: 5px;
+	color:#302F31;
+	cursor:pointer;
+	font-weight: bold;
+	padding:7px 5px;
+	width:19%;
+}
+
+#historico_mensagens .sistema{
+	background-color: #FF9900;
+	color: #302F31;
+    font-weight: bold;
+    margin-left: 5px;
+    margin-right: 5px;
+    border-radius: 40px;
+    padding: 5px;
+}
+
+#historico_mensagens .privada{
+	background-color: #CCC;
+	color: #000;
+    font-weight: bold;
+    margin-left: 5px;
+    margin-right: 5px;
+    border-radius: 40px;
+    padding: 5px;
+}
+#enviarMsg{
+    margin-left: 5px;
+    width: 10%;
+}
+#texto_mensagem{
+    width: 88%;
+}
+#footer{
+    color: white;
+    position: absolute;
+    bottom: 0;
+    margin-left: 36%;
+}

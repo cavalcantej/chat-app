@@ -1,7 +1,5 @@
 FROM python:3.8
 
-
-
 WORKDIR /app
 ADD . .
 # RUN apk add --no-cache python3-dev libffi-dev gcc musl-dev make

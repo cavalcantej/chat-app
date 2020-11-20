@@ -1,47 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" type="text/css" href="../static/css/style.css" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+    />
     <title>Chat App</title>
-</head>
-<body style="background-color: #302F31;">
-    <div style="margin-top: 0px; width: 100%; text-align: center;">
-        <img style="height: 400px;" src="../static/img/logo.png">
+  </head>
+  <body style="background-color: #302f31">
+    <div style="margin-top: 0px; width: 100%; text-align: center">
+      <img style="height: 400px" src="../static/img/logo.png" />
     </div>
-    <br>
-    <div style="width: 100%; text-align: center; color: #FFFFFF">
-        <h3>Usuário : {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Logar ou Criar conta{% endif %}</h3>    
-        <ul style="margin: 0px;">
-            <form action="" method="get">
-                {% for room in rooms %}
-                    <li style="list-style-type: none;">
-                        <form action="/rooms/{{ room._id }}">
-                            <input style="width: 150px; " type="submit" value= "{{ room.room_name }}" />
-                        </form>
-                    </li>
-                {% endfor %}
-            </form>   
-        </ul>
-        {% if current_user.is_authenticated %}
-        <form action="/create_room">
-            <input type="submit" value="Criar sala" />
+    <br />
+    <div style="width: 100%; text-align: center; color: #ffffff">
+      <h3>
+        Usuário : {% if current_user.is_authenticated %}{{ current_user.username
+        }}{% else %}Logar ou Criar conta{% endif %}
+      </h3>
+      <ul style="margin: 0px">
+        <form action="" method="get">
+          {% for room in rooms %}
+          <li style="list-style-type: none">
+            <a href="/rooms/{{ room._id }}" style="color:white">{{ room.room_name }}</a>
+          </li>
+          {% endfor %}
         </form>
-        <form action="/logout">
-            <input type="submit" value="Logout" />
-        </form>
-        
-        {% else %}
-        <form action="/login">
-            <input type="submit" value="Entrar" />
-        </form>
-        <form action="/signup">
-            <input type="submit" value="Cadastrar" />
-        </form>
-    
-        {% endif %}
+      </ul>
+      {% if current_user.is_authenticated %}
+      <form action="/create_room">
+        <input type="submit" value="Criar sala" />
+      </form>
+      <form action="/logout">
+        <input type="submit" value="Logout" />
+      </form>
+
+      {% else %}
+      <form action="/login">
+        <input type="submit" value="Entrar" />
+      </form>
+      <form action="/signup">
+        <input type="submit" value="Cadastrar" />
+      </form>
+
+      {% endif %}
     </div>
-</body>
+  </body>
 </html>

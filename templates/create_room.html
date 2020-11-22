@@ -4,35 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="../static/css/style.css" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <title>Chat App</title>
 </head>
 
-<body style="background-color: #302F31;">
-    
-    <div class="container" style="text-align: center; margin-top: 0px;">
-        <div style="margin-top: -30px; width: 100%; text-align: center;">
-            <img style="height: 400px;" src="../static/img/logo.png">
-        </div>
-        <h1 style="color: #FF9900;">Create room</h1>
-        <h3 style="color: white;">{{ message }}</h3>
-        <form method="post">
-            <label style="color: #FF9900;" for="">Nome da Sala:</label>
-            <input style="width: 200px;" type="text" name="room_name">
-            <br>
-            <br>
-            <button type="submit" style=" width: 150px; background-color: #FF9900; border: none;" class="btn btn-primary">
-            Criar
-            </button>
-            <button type="buttom" style=" width: 150px; background-color: #FF9900; border: none;" class="btn btn-primary">
-                <a style="color: white;" href="/">
-                Voltar
-                </a>
-            </button>
-            
-        </form>
-    </div>
+<body>
+    <h1>Create room</h1>
+    <h3>{{ message }}</h3>
+    <form method="post">
+        <label for="">Nome da Sala:</label>
+        <input type="text" name="room_name">
+        <br>
+        <button type="submit">Submit</button>
+    </form>
 </body>
 
 </html>

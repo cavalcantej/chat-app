@@ -23,6 +23,16 @@ form input[type='submit']{
 	padding:7px 5px;
 	width:19%;
 }
+.rooms{
+	background: #FF9900;
+	border:none;
+	border-radius: 5px;
+	color:#302F31;
+	cursor:pointer;
+	font-weight: bold;
+	padding:7px 5px;
+	width:19%;
+}
 
 #historico_mensagens .sistema{
 	background-color: #FF9900;

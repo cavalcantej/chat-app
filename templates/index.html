@@ -20,11 +20,11 @@
         Usuário : {% if current_user.is_authenticated %}{{ current_user.username
         }}{% else %}Logar ou Criar conta{% endif %}
       </h3>
-      <ul style="margin: 0px">
+      <ul style="margin-left: 42%;">
         <form action="" method="get">
           {% for room in rooms %}
-          <li style="list-style-type: none">
-            <a href="/rooms/{{ room._id }}" style="color:white">{{ room.room_name }}</a>
+          <li style="list-style-type: none; margin-top: 10px; background: #FF9900; border:none; border-radius: 5px; padding:7px 5px; width:19%;">
+            <a href="/rooms/{{ room._id }}" style="color:#302F31;">{{ room.room_name }}</a>
           </li>
           {% endfor %}
         </form>

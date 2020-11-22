@@ -26,7 +26,15 @@
     
 
     <!-- <button type="button" id="load_older_messages_btn">Load older messages</button> -->
-    <div class=" container col-sm-10" style=" position: absolute; overflow:auto; height: 620px; top: 70px; margin-left: 15px; border: 2px solid orange; border-radius: 5px; width: 89%;" >
+    <div class=" container col-sm-10" style=" display: flex; 
+                                              flex-direction: column; 
+                                              overflow: auto; 
+                                              top: 2px; 
+                                              margin-left: 15px; 
+                                              border: 2px solid orange; 
+                                              border-radius: 5px; 
+                                              width: 89%;
+                                              height: 83vh;">        
         <div style=" color: white;" id="messages">
             {% for message in messages %}
             <div>
@@ -37,10 +45,15 @@
         </div>
     </div>
 
-    <div class="col-sm-1" style=" position: absolute; margin-left: 1300px; height: 620px; border: 2px solid#FF9900; border-radius: 5px;">
+    <div class="container col-sm-1" style=" display: flex; 
+                                            flex-direction: column; 
+                                            margin-left: 10px; 
+                                            height: 83vh; 
+                                            border: 2px solid #FF9900; 
+                                            border-radius: 5px;">        
         <ul>
             {% for member in room_members %}
-                <li style="color:#FF9900; margin-left: 0px;">{{ member._id.username }}</li>
+                <li style="color:#FF9900; margin-left: -20px;">{{ member._id.username }}</li>
             {% endfor %}
         </ul>
     </div>
